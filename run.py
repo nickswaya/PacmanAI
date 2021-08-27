@@ -87,11 +87,11 @@ class GameController(object):
         self.flashBackground = False
         self.maze.reset()
         
-    def update(self):
+    def update(self, action):
         if not self.gameover:
             dt = self.clock.tick(30) / 1000.0
             if not self.pause.paused:
-                self.pacman.update(dt)
+                self.pacman.update(dt, action)
                 self.ghosts.update(dt, self.pacman)
                 if self.fruit is not None:
                     self.fruit.update(dt)

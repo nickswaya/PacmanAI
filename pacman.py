@@ -4,6 +4,15 @@ from vector import Vector2
 from constants import *
 from entity import MazeRunner
 from animation import Animation
+from enum import Enum
+import numpy as np
+
+class Direction(Enum):
+    RIGHT = 1
+    LEFT = 2
+    UP = 3
+    DOWN = 4
+    STOP = 5
 
 class Pacman(MazeRunner):
     def __init__(self, nodes, spritesheet):
@@ -31,11 +40,11 @@ class Pacman(MazeRunner):
         self.animations["death"].reset()
         self.animateDeath = False
         
-    def update(self, dt):
+    def update(self, dt, action):        
         self.visible = True
         self.position += self.direction*self.speed*dt
         self.updateAnimation(dt)
-        direction = self.getValidKey()
+        direction = self.getValidKey(action)
         if direction:
             self.moveByKey(direction)
         else:
@@ -44,7 +53,19 @@ class Pacman(MazeRunner):
     def updateDeath(self, dt):
         self.image = self.animation.update(dt)
         
-    def getValidKey(self):
+    def getValidKey(self, action):
+        clock_wise = [Direction.RIGHT, Direction.DOWN, Direction.LEFT, Direction.UP, Direction.STOP]
+        if np.array_equal(action, [1, 0, 0, 0, 0]):
+            return RIGHT
+        if np.array_equal(action, [0, 1, 0, 0, 0]):
+            return DOWN
+        if np.array_equal(action, [0, 0, 1, 0, 0]):
+            return LEFT
+        if np.array_equal(action, [0, 0, 0, 1, 0]):
+            return UP
+        if np.array_equal(action, [0, 0, 0, 0, 1]):
+            return None
+
         key_pressed = pygame.key.get_pressed()
         if key_pressed[K_UP]:
             return UP
@@ -57,6 +78,7 @@ class Pacman(MazeRunner):
         return None
 
     def moveByKey(self, direction):
+
         if self.direction is STOP:
             if self.node.neighbors[direction] is not None:
                 self.target = self.node.neighbors[direction]
