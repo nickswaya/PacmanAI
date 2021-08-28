@@ -6,7 +6,7 @@ class MazeRunner(object):
     def __init__(self, nodes, spritesheet):
         self.name = ""
         self.direction = STOP
-        self.speed = 6.25 * TILEWIDTH
+        self.speed = 10.25 * TILEWIDTH
         self.radius = 10
         self.collideRadius = 5
         self.color = WHITE

@@ -29,7 +29,7 @@ class Pauser(object):
 
     def force(self, pause):
         self.paused = pause
-        self.playerPaused = pause
+        self.playerPaused = False
         self.timer = 0
         self.pauseTime = 0
 

@@ -36,7 +36,7 @@ class Agent:
         self.epsilon = 0 # randomness
         self.gamma = 0.9 # discount rate
         self.memory = deque(maxlen=MAX_MEMORY) # popleft()
-        self.model = Linear_QNet(20, 256, 3)
+        self.model = Linear_QNet(20, 256, 5)
         self.trainer = QTrainer(self.model, lr=LR, gamma=self.gamma)
 
     def get_state(self, game):
@@ -66,13 +66,15 @@ class Agent:
 
     def get_action(self, state):
         # random moves: tradeoff exploration / exploitation
-        self.epsilon = 80 - self.n_games
+        self.epsilon = 250 - self.n_games
         # up, down, left, right
         final_move = [0,0,0,0,0]
         if random.randint(0, 200) < self.epsilon:
             move = random.randint(0, 4)
             final_move[move] = 1
+            print('EXPLORE MOVE')
         else:
+            print("EXPLOIT MOVE")
             state0 = torch.tensor(state, dtype=torch.float)
             prediction = self.model(state0)
             move = torch.argmax(prediction).item()
@@ -95,35 +97,34 @@ def train():
         # get move
         final_move = agent.get_action(state_old)
 
-        game.update(final_move)
-
+        reward, done, score = game.update(final_move)
+        
         # perform move and get new state
-        # reward, done, score = game.play_step(final_move)
-        # state_new = agent.get_state(game)
+        state_new = agent.get_state(game)
 
         # # train short memory
-        # agent.train_short_memory(state_old, final_move, reward, state_new, done)
+        agent.train_short_memory(state_old, final_move, reward, state_new, done)
 
-        # # remember
-        # agent.remember(state_old, final_move, reward, state_new, done)
+        # remember
+        agent.remember(state_old, final_move, reward, state_new, done)
 
-        # if done:
-        #     # train long memory, plot result
-        #     game.reset()
-        #     agent.n_games += 1
-        #     agent.train_long_memory()
+        if done:
+            # train long memory, plot result
+            game.startGame()
+            agent.n_games += 1
+            agent.train_long_memory()
 
-        #     if score > record:
-        #         record = score
-        #         agent.model.save()
+            if score > record:
+                record = score
+                agent.model.save()
 
-        #     print('Game', agent.n_games, 'Score', score, 'Record:', record)
+            print('Game', agent.n_games, 'Score', score, 'Record:', record)
 
-        #     plot_scores.append(score)
-        #     total_score += score
-        #     mean_score = total_score / agent.n_games
-        #     plot_mean_scores.append(mean_score)
-        #     plot(plot_scores, plot_mean_scores)
+            plot_scores.append(score)
+            total_score += score
+            mean_score = total_score / agent.n_games
+            plot_mean_scores.append(mean_score)
+            plot(plot_scores, plot_mean_scores)
 
 if __name__ == '__main__':       
     train()

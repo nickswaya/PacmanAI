@@ -20,7 +20,7 @@ class Pacman(MazeRunner):
         self.name = "pacman"
         self.color = YELLOW
         self.setStartPosition()
-        self.lives = 5
+        self.lives = 1
         self.startImage = self.spritesheet.getImage(4,0,TILEWIDTH*2, TILEHEIGHT*2)
         self.image = self.startImage
         self.animation = None

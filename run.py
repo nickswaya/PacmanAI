@@ -43,6 +43,7 @@ class GameController(object):
     def startGame(self):
         print("Start game")
         self.level.reset()
+        self.score = 0
         levelmap = self.level.getLevel()
         self.maze.getMaze(levelmap["name"].split(".")[0])
         self.maze.constructMaze(self.background, self.background_flash, levelmap["row"])
@@ -108,7 +109,7 @@ class GameController(object):
                     self.maze.flash(dt)
                     
                 if self.pacman.animateDeath:
-                    self.reward = -10
+                    self.reward = -20
                     self.pacman.updateDeath(dt)
 
             self.pause.update(dt)
@@ -117,7 +118,8 @@ class GameController(object):
         self.checkEvents()
         self.text.updateScore(self.score)
         self.render()
-        self.reward -= 1/2
+        print(self.reward)
+        return self.reward, self.gameover, self.score
 
     def checkEvents(self):
         for event in pygame.event.get():
@@ -140,7 +142,7 @@ class GameController(object):
             #pygame.mixer.Sound.play(self.eat_sound)
             self.pelletsEaten += 1
             self.score += pellet.points
-            self.reward += pellet.points
+            self.reward += 1
             if (self.pelletsEaten == 70 or self.pelletsEaten == 140):
                 if self.fruit is None:
                     levelmap = self.level.getLevel()
@@ -149,6 +151,7 @@ class GameController(object):
             if pellet.name == "powerpellet":
                 self.ghosts.resetPoints()
                 self.ghosts.freightMode()
+                self.reward += 15
             if self.pellets.isEmpty():
                 self.pacman.visible = False
                 self.ghosts.hide()
@@ -162,7 +165,7 @@ class GameController(object):
         if ghost is not None:
             if ghost.mode.name == "FREIGHT":
                 self.score += ghost.points
-                self.reward += ghost.points
+                self.reward += 20
                 self.text.createTemp(ghost.points, ghost.position)
                 self.ghosts.updatePoints()
                 ghost.spawnMode(speed=2)
@@ -173,7 +176,7 @@ class GameController(object):
             elif ghost.mode.name != "SPAWN":
                 self.pacman.loseLife()
                 self.ghosts.hide()
-                self.pause.startTimer(3, "die")
+                self.pause.startTimer(.001, "die")
             
     def checkFruitEvents(self):
         if self.fruit is not None:
