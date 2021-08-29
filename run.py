@@ -118,7 +118,6 @@ class GameController(object):
         self.checkEvents()
         self.text.updateScore(self.score)
         self.render()
-        print(self.reward)
         return self.reward, self.gameover, self.score
 
     def checkEvents(self):

@@ -18,7 +18,7 @@ def plot(scores, mean_scores):
     plt.legend()
     plt.show(block=False)
     plt.pause(.1)
-    plt.savefig('score')
+    plt.savefig('score with epsilon of 450')
 
 def unpack_tuple_list(tuple_list):
     res = []
