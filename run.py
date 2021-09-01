@@ -42,6 +42,9 @@ class GameController(object):
 
     def startGame(self):
         print("Start game")
+        print('self.gameover = False')
+        print('Starting Reward = ', self.reward)
+        self.reward = 0
         self.level.reset()
         self.score = 0
         levelmap = self.level.getLevel()
@@ -80,10 +83,13 @@ class GameController(object):
         
     def restartLevel(self):
         print("Restart current level")
+        print('TEST HERE')
+        self.gameover = False
+        self.score = 0
         self.reward = 0
         self.pacman.reset()
         self.ghosts = GhostGroup(self.nodes, self.sheet)
-        self.pause.force(True)
+        self.pause.force(False)
         self.fruit = None
         self.flashBackground = False
         self.maze.reset()
@@ -109,7 +115,7 @@ class GameController(object):
                     self.maze.flash(dt)
                     
                 if self.pacman.animateDeath:
-                    self.reward = -20
+                    self.reward = -2000
                     self.pacman.updateDeath(dt)
 
             self.pause.update(dt)
@@ -118,6 +124,8 @@ class GameController(object):
         self.checkEvents()
         self.text.updateScore(self.score)
         self.render()
+        # adding penalty for not getting pellets (preventing ramming into wall repeatedly)
+        self.reward -= 1/100
         return self.reward, self.gameover, self.score
 
     def checkEvents(self):

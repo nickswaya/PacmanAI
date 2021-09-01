@@ -34,17 +34,20 @@ class Agent:
     def __init__(self):
         self.n_games = 0
         self.epsilon = 0 # randomness
-        self.gamma = 0.9 # discount rate
+        self.gamma = 0.96 # discount rate
         self.memory = deque(maxlen=MAX_MEMORY) # popleft()
-        self.model = Linear_QNet(20, 256, 5)
+        self.model = Linear_QNet(10, 256, 5)
         self.trainer = QTrainer(self.model, lr=LR, gamma=self.gamma)
+
 
     def get_state(self, game):
         pacman_position = game.pacman.position.asInt()
-        pacman_direction = game.pacman.direction.asInt()
+        # pacman_direction = game.pacman.direction.asInt()
         ghost_positions = [ghost.position.asInt() for ghost in game.ghosts]
-        ghost_directions = [ghost.direction.asInt() for ghost in game.ghosts]
-        state = [pacman_position, pacman_direction, ghost_positions, ghost_directions]
+        # ghost_directions = [ghost.direction.asInt() for ghost in game.ghosts]
+        # state = [pacman_position, pacman_direction, ghost_positions, ghost_directions]
+        state = [pacman_position, ghost_positions]
+
         state = add_flatten_lists(state)
         return np.array(state, dtype=int)
 
@@ -65,21 +68,19 @@ class Agent:
 
 
     def get_action(self, state):
+        
         # random moves: tradeoff exploration / exploitation
-        self.epsilon = 450 - self.n_games
+        self.epsilon = 80 - self.n_games
         # up, down, left, right
         final_move = [0,0,0,0,0]
         if random.randint(0, 200) < self.epsilon:
             move = random.randint(0, 4)
             final_move[move] = 1
-            # print('EXPLORE MOVE')
         else:
-            # print("EXPLOIT MOVE")
             state0 = torch.tensor(state, dtype=torch.float)
             prediction = self.model(state0)
             move = torch.argmax(prediction).item()
             final_move[move] = 1
-
         return final_move
 
 def train():
@@ -90,15 +91,15 @@ def train():
     game = GameController()
     game.startGame()
     agent = Agent()
+    action=[0,0,0,0,0]
     while True:
-        game.update(action=[0,0,0,0,0])
+        game.update(action)
         # get old state
         state_old = agent.get_state(game)
         # get move
         final_move = agent.get_action(state_old)
 
         reward, done, score = game.update(final_move)
-        
         # perform move and get new state
         state_new = agent.get_state(game)
 

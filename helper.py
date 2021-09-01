@@ -1,5 +1,7 @@
 import matplotlib.pyplot as plt
 from IPython import display
+import pandas as pd
+import os
 
 plt.ion()
 
@@ -38,3 +40,6 @@ def add_flatten_lists(the_lists):
         result += _list
     result = unpack_tuple_list(result)
     return result
+
+
+    
