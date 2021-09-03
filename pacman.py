@@ -66,15 +66,16 @@ class Pacman(MazeRunner):
         if np.array_equal(action, [0, 0, 0, 0, 1]):
             return None
 
-        key_pressed = pygame.key.get_pressed()
-        if key_pressed[K_UP]:
-            return UP
-        if key_pressed[K_DOWN]:
-            return DOWN
-        if key_pressed[K_LEFT]:
-            return LEFT
-        if key_pressed[K_RIGHT]:
-            return RIGHT
+        # key_pressed = pygame.key.get_pressed()
+        # if key_pressed[K_UP]:
+        #     return UP
+        # if key_pressed[K_DOWN]:
+        #     return DOWN
+        # if key_pressed[K_LEFT]:
+        #     return LEFT
+        # if key_pressed[K_RIGHT]:
+        #     return RIGHT
+        
         return None
 
     def moveByKey(self, direction):

@@ -14,7 +14,6 @@ from pygame.locals import *
 from entity import MazeRunner
 from animation import Animation
 import pygame
-from vector import Vector2
 from stack import Stack
 from model import Linear_QNet, QTrainer
 from helper import *
@@ -34,7 +33,7 @@ class Agent:
     def __init__(self):
         self.n_games = 0
         self.epsilon = 0 # randomness
-        self.gamma = 0.96 # discount rate
+        self.gamma = 0.95 # discount rate
         self.memory = deque(maxlen=MAX_MEMORY) # popleft()
         self.model = Linear_QNet(10, 256, 5)
         self.trainer = QTrainer(self.model, lr=LR, gamma=self.gamma)
@@ -70,7 +69,7 @@ class Agent:
     def get_action(self, state):
         
         # random moves: tradeoff exploration / exploitation
-        self.epsilon = 80 - self.n_games
+        self.epsilon = 1500 - self.n_games
         # up, down, left, right
         final_move = [0,0,0,0,0]
         if random.randint(0, 200) < self.epsilon:
@@ -83,6 +82,9 @@ class Agent:
             final_move[move] = 1
         return final_move
 
+
+action = [0,0,0,0,0]
+
 def train():
     plot_scores = []
     plot_mean_scores = []
@@ -91,7 +93,6 @@ def train():
     game = GameController()
     game.startGame()
     agent = Agent()
-    action=[0,0,0,0,0]
     while True:
         game.update(action)
         # get old state
@@ -100,6 +101,7 @@ def train():
         final_move = agent.get_action(state_old)
 
         reward, done, score = game.update(final_move)
+        # print(reward)
         # perform move and get new state
         state_new = agent.get_state(game)
 

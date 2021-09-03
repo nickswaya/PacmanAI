@@ -73,7 +73,7 @@ class TextGroup(object):
         self.textlist["level"].setText(str(level).zfill(3))
 
     def showReady(self):
-        self.textlist["ready"].show = True
+        self.textlist["ready"].show = False
         self.textlist["paused"].show = False
         self.textlist["gameover"].show = False
         

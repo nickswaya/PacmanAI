@@ -41,6 +41,8 @@ class PelletGroup(object):
         self.pelletSymbols = ["p", "n", "Y"]
         self.powerpelletSymbols = ["P", "N"]
         self.createPelletList(mazefile)
+        self.dummy_list = [1 for pellet in self.pelletList]
+
 
     def update(self, dt):
         for powerpellet in self.powerpellets:
