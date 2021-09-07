@@ -22,7 +22,7 @@ class GameController(object):
         self.clock = pygame.time.Clock()
         self.pelletsEaten = 0
         self.fruit = None
-        self.pause = Pauser(True)
+        self.pause = Pauser(False)
         self.level = LevelController()
         self.text = TextGroup()
         self.score = 0
@@ -90,9 +90,15 @@ class GameController(object):
         self.fruit = None
         self.flashBackground = False
         self.maze.reset()
-        
+
+    def pacman_stopped(self):
+        if self.pacman.direction.x == 0 and self.pacman.direction.y == 0:
+            return True
+        return False
+
     def update(self, action):
         if not self.gameover:
+            
             dt = self.clock.tick(30) / 1000.0
             if not self.pause.paused:
                 self.pacman.update(dt, action)
@@ -120,6 +126,9 @@ class GameController(object):
         self.checkEvents()
         self.text.updateScore(self.score)
         self.render()
+        # if self.pacman_stopped():
+        #     self.reward -= .1
+        
         
         return self.reward, self.gameover, self.score
 
@@ -144,7 +153,7 @@ class GameController(object):
             #pygame.mixer.Sound.play(self.eat_sound)
             self.pelletsEaten += 1
             self.score += pellet.points
-            self.reward += 1
+            
             if (self.pelletsEaten == 70 or self.pelletsEaten == 140):
                 if self.fruit is None:
                     levelmap = self.level.getLevel()
@@ -153,13 +162,15 @@ class GameController(object):
             if pellet.name == "powerpellet":
                 self.ghosts.resetPoints()
                 self.ghosts.freightMode()
-                self.reward += 1
+                # self.reward += 1
             if self.pellets.isEmpty():
                 self.pacman.visible = False
                 self.ghosts.hide()
                 self.pause.startTimer(3, "clear")
                 self.flashBackground = True
                 
+    
+
 
     def checkGhostEvents(self):
         self.ghosts.release(self.pelletsEaten)
@@ -168,7 +179,7 @@ class GameController(object):
             if ghost.mode.name == "FREIGHT":
                 self.score += ghost.points
                 #penalize for eating ghost since no information is saved in state regarding if ghosts will kill you or give points
-                self.reward -= 200
+                self.reward -= 20
                 self.text.createTemp(ghost.points, ghost.position)
                 self.ghosts.updatePoints()
                 ghost.spawnMode(speed=2)
@@ -182,6 +193,8 @@ class GameController(object):
                 self.ghosts.hide()
                 self.pause.startTimer(.001, "die")
                 self.gameover = True
+
+
 
     def checkFruitEvents(self):
         if self.fruit is not None:

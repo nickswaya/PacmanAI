@@ -32,12 +32,12 @@ class Pacman(MazeRunner):
     def loseLife(self):
         self.lives -= 1
         self.animation = self.animations["death"]
-        self.animateDeath = True
+        self.animateDeath = False
 
     def reset(self):
         self.setStartPosition()
         self.image = self.startImage
-        self.animations["death"].reset()
+        # self.animations["death"].reset()
         self.animateDeath = False
         
     def update(self, dt, action):        

@@ -35,24 +35,26 @@ class Agent:
         self.epsilon = 0 # randomness
         self.gamma = 0.95 # discount rate
         self.memory = deque(maxlen=MAX_MEMORY) # popleft()
-        self.model = Linear_QNet(10, 256, 5)
+        self.model = Linear_QNet(2036, 1356, 5)
         self.trainer = QTrainer(self.model, lr=LR, gamma=self.gamma)
 
 
     def get_state(self, game):
+        maze_coords = game.maze.maze_coords
         pacman_position = game.pacman.position.asInt()
-        # pacman_direction = game.pacman.direction.asInt()
+        pacman_direction = game.pacman.direction.asInt()
         ghost_positions = [ghost.position.asInt() for ghost in game.ghosts]
-        # ghost_directions = [ghost.direction.asInt() for ghost in game.ghosts]
-        # state = [pacman_position, pacman_direction, ghost_positions, ghost_directions]
-        state = [pacman_position, ghost_positions]
+        ghost_directions = [ghost.direction.asInt() for ghost in game.ghosts]
+        state = [pacman_position, pacman_direction, ghost_positions, ghost_directions, maze_coords]
+        # state = [pacman_position, ghost_positions, ]
 
         state = add_flatten_lists(state)
+        
         return np.array(state, dtype=int)
 
     def remember(self, state, action, reward, next_state, done):
         self.memory.append((state, action, reward, next_state, done)) # popleft if MAX_MEMORY is reached
-
+        
     def train_long_memory(self):
         if len(self.memory) > BATCH_SIZE:
             mini_sample = random.sample(self.memory, BATCH_SIZE) # list of tuples
@@ -69,17 +71,19 @@ class Agent:
     def get_action(self, state):
         
         # random moves: tradeoff exploration / exploitation
-        self.epsilon = 1500 - self.n_games
+        self.epsilon = 80 - self.n_games
         # up, down, left, right
         final_move = [0,0,0,0,0]
         if random.randint(0, 200) < self.epsilon:
             move = random.randint(0, 4)
             final_move[move] = 1
+            print('random')
         else:
             state0 = torch.tensor(state, dtype=torch.float)
             prediction = self.model(state0)
             move = torch.argmax(prediction).item()
             final_move[move] = 1
+            print('predicted')
         return final_move
 
 
@@ -112,6 +116,7 @@ def train():
         agent.remember(state_old, final_move, reward, state_new, done)
 
         if done:
+            
             # train long memory, plot result
             game.startGame()
             agent.n_games += 1

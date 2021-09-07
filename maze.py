@@ -61,10 +61,13 @@ class Maze(object):
         self.getMazeImages(row)
         rows = len(self.spriteInfo)
         cols = len(self.spriteInfo[0])
+        self.maze_coords = []
         for row in range(rows):
             for col in range(cols):
                 x = col * TILEWIDTH
                 y = row * TILEHEIGHT
+                self.maze_coords.append(x)
+                self.maze_coords.append(y)
                 val = self.spriteInfo[row][col]
                 if val.isdigit():
                     rotVal = self.rotateInfo[row][col]
@@ -79,4 +82,5 @@ class Maze(object):
         self.background_norm = background
         self.background_flash = background_flash
         self.background = background
+        
                     
